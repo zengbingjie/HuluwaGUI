@@ -9,14 +9,16 @@ public class Creature extends Thing2D implements Runnable {
     private String name;
     private char identify;
     private CreatureState state;
+    private int hp;
 
-    public Creature(int x, int y, Field field, String name, CreatureState state, char identify) {
+    public Creature(int x, int y, Field field, String name, CreatureState state, char identify, int hp) {
         super(x, y);
 
         this.field = field;
         this.name = name;
         this.identify = identify;
         this.state = state;
+        this.hp = hp;
 
         URL loc = this.getClass().getClassLoader().getResource(this.name + this.state.toString() + ".png");
         ImageIcon iia = new ImageIcon(loc);
@@ -27,21 +29,17 @@ public class Creature extends Thing2D implements Runnable {
     private void battleWith(Creature enemy){
         if (this.getCamp()==Camp.GOOD){
             Random random = new Random();
-            if (random.nextInt(10)>4) { // 60% chance for huluwas to win~
-                enemy.setState(CreatureState.DEAD);
-                enemy.resetImage();
+            if (random.nextInt(100)>43) { // 60% chance for huluwas to win~
+                enemy.behurt();
             } else {
-                this.setState(CreatureState.DEAD);
-                this.resetImage();
+                this.behurt();
             }
         } else {
             Random random = new Random();
-            if (random.nextInt(10)>6) { // 60% chance for huluwas to win~
-                enemy.setState(CreatureState.DEAD);
-                enemy.resetImage();
+            if (random.nextInt(100)>57) { // 60% chance for huluwas to win~
+                enemy.behurt();
             } else {
-                this.setState(CreatureState.DEAD);
-                this.resetImage();
+                this.behurt();
             }
         }
     }
@@ -107,5 +105,14 @@ public class Creature extends Thing2D implements Runnable {
     }
     public boolean isAlive() {
         return this.state!=CreatureState.DEAD;
+    }
+
+    private void behurt() {
+        this.hp -= 2;
+        if (this.hp < 0){
+            this.hp = 0;
+            this.setState(CreatureState.DEAD);
+            this.resetImage();
+        }
     }
 }

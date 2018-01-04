@@ -7,7 +7,7 @@ public class Snake extends Creature {
 
     public Snake(int x, int y, Field field){
         // x, y, field, name, state, identify
-        super(x, y, field, "snake", CreatureState.LEFT,  's');
+        super(x, y, field, "snake", CreatureState.LEFT,  's', 100);
     }
 
     private void conduct(){

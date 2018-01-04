@@ -6,7 +6,7 @@ public class Scorpion extends Creature {
 
     public Scorpion(int x, int y, Field field){
         // x, y, field, name, state, identify
-        super(x, y, field, "scorpion", CreatureState.LEFT, 'x');
+        super(x, y, field, "scorpion", CreatureState.LEFT, 'x', 150);
     }
 
     @Override

@@ -7,7 +7,7 @@ public class Grandpa extends Creature{
 
     public Grandpa(int x, int y, Field field){
         // x, y, field, name, state, identify
-        super(x, y, field, "grandpa", CreatureState.RIGHT ,'g');
+        super(x, y, field, "grandpa", CreatureState.RIGHT ,'g', 100);
     }
 
     private void conduct(){
