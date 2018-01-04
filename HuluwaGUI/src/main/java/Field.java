@@ -194,4 +194,24 @@ public class Field extends JPanel {
     public int getSPACE() {
         return SPACE;
     }
+
+    public boolean gameHasOver(){
+        boolean goodCampAllDead = true, evilCampAllDead = true;
+        for (int i = 0; i < world.size(); i++) {
+            Thing2D item = (Thing2D) world.get(i);
+            if (item instanceof Creature){
+                if (((Creature) item).getCamp()==Camp.GOOD && ((Creature) item).isAlive()){
+                    goodCampAllDead = false;
+                } else if (((Creature) item).getCamp()==Camp.EVIL && ((Creature) item).isAlive()){
+                    evilCampAllDead = false;
+                } else {
+                    // do nothing
+                }
+                if (goodCampAllDead==false && evilCampAllDead==false){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 }

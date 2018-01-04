@@ -4,7 +4,9 @@ public class Huluwa extends Creature {
 
     private int rank; // 1~7
 
-    private final int SPEED = 1;
+    private final int SPEED = 2;
+
+    private HuluwaMoveStrategy moveStrategy = new HuluwaMoveStrategy();
 
     public Huluwa(int x, int y, Field field, int rank){
         // x, y, field, name, state, identify
@@ -14,14 +16,25 @@ public class Huluwa extends Creature {
     }
 
     private void fight() {
-        MoveStrategyResult deltaPosition = new HuluwaMoveStrategy().howToMove(this.field, this.x(), this.y());
+        MoveStrategyResult deltaPosition = moveStrategy.howToMove(this.field, this.x(), this.y());
+        if (deltaPosition.getX()>0){
+            this.setState(CreatureState.RIGHT);
+            this.resetImage();
+        } else if (deltaPosition.getX()<0){
+            this.setState(CreatureState.LEFT);
+            this.resetImage();
+        } else {
+            // do nothing. not change direction
+        }
         this.move(deltaPosition.getX()*SPEED,deltaPosition.getY()*SPEED);
     }
 
     @Override
     public void run() {
         while (!Thread.interrupted()) {
-            this.fight();
+            if (this.isAlive()) {
+                this.fight();
+            }
             try {
                 Thread.sleep(10);
                 this.field.repaint();

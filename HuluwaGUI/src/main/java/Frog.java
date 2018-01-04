@@ -10,7 +10,9 @@ public class Frog extends Creature {
     @Override
     public void run() {
         while (!Thread.interrupted()) {
-            move(-SPEED, 0); // stupid move
+            if (this.isAlive()) {
+                move(-SPEED, 0); // stupid move
+            }
             try {
                 Thread.sleep(10);
                 this.field.repaint();

@@ -9,8 +9,8 @@ public class ConductorMoveStrategy implements MoveStrategy {
     public MoveStrategyResult howToMove(Field field, int myX, int myY) {
         count++;
         MoveStrategyResult rslt = new MoveStrategyResult();
-        if (count%5==0) { // walk slower
-            if (count >= 100) { // change walking direction
+        if (count%10==0) { // walk slower
+            if (count >= 800) { // change walking direction
                 count = 0;
                 Random random = new Random();
                 if ((random.nextInt(2)) > 0) {

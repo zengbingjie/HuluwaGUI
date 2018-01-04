@@ -2,7 +2,7 @@ import java.util.Random;
 
 public class Scorpion extends Creature {
 
-    private final int SPEED = 1;
+    private final int SPEED = 2;
 
     public Scorpion(int x, int y, Field field){
         // x, y, field, name, state, identify
@@ -12,7 +12,9 @@ public class Scorpion extends Creature {
     @Override
     public void run() {
         while (!Thread.interrupted()) {
-            move(-SPEED, 0); // stupid move
+            if (this.isAlive()) {
+                move(-SPEED, 0); // stupid move
+            }
             try {
                 Thread.sleep(10);
                 this.field.repaint();
