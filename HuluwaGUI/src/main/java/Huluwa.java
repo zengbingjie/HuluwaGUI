@@ -10,7 +10,7 @@ public class Huluwa extends Creature {
 
     public Huluwa(int x, int y, Field field, int rank){
         // x, y, field, name, state, identify
-        super(x, y, field, COLOR.values()[rank-1].toString(), CreatureState.RIGHT, Integer.toString(rank).charAt(0), 100);
+        super(x, y, field, COLOR.values()[rank-1].toString(), CreatureState.RIGHT, Integer.toString(rank).charAt(0), 100+(7-rank)*5);
 
         this.rank = rank;
     }

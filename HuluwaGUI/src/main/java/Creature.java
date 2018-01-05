@@ -45,7 +45,7 @@ public class Creature extends Thing2D implements Runnable {
     }
 
     public void move(int x, int y) {
-        if (!this.field.gameHasOver()) {
+        if (!this.field.gameIsOver()) {
             MoveChecker moveChecker = new MoveChecker(this.field);
             int nx = this.x() + x;
             int ny = this.y() + y;
@@ -108,11 +108,16 @@ public class Creature extends Thing2D implements Runnable {
     }
 
     private void behurt() {
-        this.hp -= 2;
+        this.hp -= 5;
         if (this.hp < 0){
             this.hp = 0;
             this.setState(CreatureState.DEAD);
             this.resetImage();
         }
+    }
+
+    public String getRecord() {
+        // image name + position x + position y
+        return ((this.name + this.state.toString() + ".png ") + (Integer.toString(this.x())) + " " + (Integer.toString(this.y())) + "\n");
     }
 }

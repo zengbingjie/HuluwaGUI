@@ -1,0 +1,3 @@
+public enum GameState {
+    BEGIN, PLAYING, OVER, PEACE, REPLAYING, REPLAYOVER
+}

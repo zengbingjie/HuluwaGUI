@@ -13,11 +13,17 @@ public class HuluwaMoveStrategy implements MoveStrategy {
 
         MoveStrategyResult rslt = new MoveStrategyResult();
 
-        if (keepStillCount>400){
+        if (keepStillCount>300){
             keepStillCount++;
-            if (keepStillCount<500) {
-                rslt.setX(1);
-                rslt.setY(0);
+            if (keepStillCount<400) {
+                Random random = new Random();
+                if (random.nextInt(100)>10) {
+                    rslt.setX(1);
+                    rslt.setY(0);
+                } else {
+                    rslt.setX(0);
+                    rslt.setY(1);
+                }
                 lastMyX = myX;
                 lastMyY = myY;
                 return rslt;
@@ -28,7 +34,7 @@ public class HuluwaMoveStrategy implements MoveStrategy {
 
         if (myX==lastMyX && myY==lastMyY){
             keepStillCount++;
-            if (keepStillCount>400){
+            if (keepStillCount>300){
                 rslt.setX(1);
                 rslt.setY(0);
                 lastMyX = myX;
