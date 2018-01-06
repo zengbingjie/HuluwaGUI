@@ -11,8 +11,11 @@ public class Replayer implements Runnable {
 
     private BufferedReader bufferedReader;
 
-    public Replayer(Field field){
+    private RecordBuffer recordBuffer;
+
+    public Replayer(Field field, RecordBuffer recordBuffer) {
         this.field = field;
+        this.recordBuffer = recordBuffer;
     }
 
     public boolean loadRecord() {
@@ -43,18 +46,29 @@ public class Replayer implements Runnable {
                 int worldSize = Integer.parseInt(recordLine);
                 recordLine = bufferedReader.readLine();
                 //System.out.println(recordLine);
-                while (recordLine!=null) {
-                    this.field.getRecord().clear();
-                    for (int i=0; i<worldSize && recordLine!=null; i++) {
+                while ((recordLine!=null) && (!Thread.interrupted())) {
+                    ArrayList tempRecords = new ArrayList();
+                    int i;
+                    for (i=0; i<worldSize && recordLine!=null; i++) {
                         String[] recordArgs = recordLine.split(" ");
                         String imageName = recordArgs[0];
                         int x = Integer.parseInt(recordArgs[1]);
                         int y = Integer.parseInt(recordArgs[2]);
-                        this.field.getRecord().add(new Record(imageName, x, y));
+                        tempRecords.add(new Record(imageName, x, y));
                         recordLine = bufferedReader.readLine();
+                        //System.out.println(recordLine);
+                    }
+                    if (i==worldSize){
+                        try {
+                            recordBuffer.waitForReading();
+                            recordBuffer.writeNew(tempRecords);
+                        } catch (InterruptedException e){
+                            e.printStackTrace();
+                        }
                     }
                     if (recordLine==null){
                         this.field.setStateREPLAYOVER();
+                        this.field.repaint();
                         break;
                     }
                     try{
@@ -63,7 +77,7 @@ public class Replayer implements Runnable {
                     } catch (Exception e) {
                         Thread.currentThread().interrupt();
                     }
-                    recordLine = bufferedReader.readLine();
+                    //recordLine = bufferedReader.readLine();
                     //System.out.println(recordLine);
                 }
                 this.field.setStateREPLAYOVER();

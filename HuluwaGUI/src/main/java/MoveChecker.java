@@ -6,7 +6,7 @@ public class MoveChecker {
         this.field = field;
     }
     public boolean isWithinBoard(int x, int y){
-        return ((x>=0) && (x<field.getBoardWidth()) && (y>=0) && (y<field.getBoardHeight()));
+        return ((x>=0) && (x<(field.getBoardWidth()-field.getSPACE())) && (y>=0) && (y<(field.getBoardHeight()-field.getSPACE())));
     }
     public boolean isMoveable(char identify, int x, int y){
         int space = field.getSPACE(), w = field.getBoardWidth(), h = field.getBoardHeight();

@@ -27,10 +27,11 @@ public class Field extends JPanel {
 
     private GameState gameState;
 
+    private RecordBuffer recordBuffer; // for repaint and replayer
+    //private ArrayList record;
+
     private Recorder recorder;
     private Replayer replayer;
-
-    private ArrayList record;
 
     private java.util.Timer checkGameOverTimer = new Timer();
 
@@ -52,6 +53,7 @@ public class Field extends JPanel {
         addKeyListener(new TAdapter());
         setFocusable(true);
         initWorld();
+        initReplayer();
     }
 
     public int getBoardWidth() {
@@ -174,9 +176,16 @@ public class Field extends JPanel {
 
         } else if (gameState == GameState.REPLAYING || gameState == GameState.REPLAYOVER){
 
-            //System.out.println(record.size());
-            for (int i = 0; i < this.record.size(); i++) {
-                Record item = (Record) record.get(i);
+            ArrayList tempRecords = new ArrayList();
+            try {
+                recordBuffer.waitForSaving();
+                tempRecords =  recordBuffer.getRecords();
+                //System.out.println(tempRecords.size());
+            } catch (InterruptedException e){
+                e.printStackTrace();
+            }
+            for (int i = 0; i < tempRecords.size(); i++) {
+                Record item = (Record) tempRecords.get(i);
                 //System.out.println(item.getImgName());
                 if (item.getImgName().endsWith("DEAD.png")){
                     g.drawImage(new ImageIcon(getClass().getClassLoader().getResource(item.getImgName())).getImage(), item.getX(), item.getY(), this);
@@ -187,6 +196,14 @@ public class Field extends JPanel {
             if (gameState == GameState.REPLAYOVER){
                 exec.shutdownNow();
                 g.drawImage(new ImageIcon(getClass().getClassLoader().getResource("replayOverHint.png")).getImage(), 20, 20, getWidth()/4, getHeight()/8, this);
+                int replayOverResult = Record.checkReplayOverResult(tempRecords);
+                if (replayOverResult==1) { // huluwa win
+                    g.drawImage(new ImageIcon(getClass().getClassLoader().getResource("huluwaWinHint.png")).getImage(), getWidth()/4, getHeight()/6, getWidth()/2, getHeight()/6, this);
+                } else if (replayOverResult==0) { // peace
+                    g.drawImage(new ImageIcon(getClass().getClassLoader().getResource("peaceHint.png")).getImage(), getWidth()/4, getHeight()/6, getWidth()/2, getHeight()/6, this);
+                } else { // evil win
+                    g.drawImage(new ImageIcon(getClass().getClassLoader().getResource("badWinHint.png")).getImage(), getWidth()/4, getHeight()/6, getWidth()/2, getHeight()/6, this);
+                }
             }
 
         }
@@ -231,18 +248,24 @@ public class Field extends JPanel {
                     repaint();
                 }
             } else if (key == KeyEvent.VK_R) { // Restart game
-                exec.shutdownNow();
-                checkGameOverTimer.cancel();
-                if (gameState == GameState.OVER){
-                    // not save record file
-                    recorder.clearCurrentRecord();
+                if (gameState == GameState.REPLAYING) {
+                    exec.shutdownNow();
+                    gameState = GameState.BEGIN;
+                    restartLevel();
+                    repaint();
+                } else {
+                    exec.shutdownNow();
+                    checkGameOverTimer.cancel();
+                    if (gameState == GameState.OVER) {
+                        // not save record file
+                        recorder.clearCurrentRecord();
+                    }
+                    restartLevel();
+                    repaint();
                 }
-                restartLevel();
-                repaint();
             } else if (key == KeyEvent.VK_L) { // Load Record
                 if (gameState == GameState.BEGIN){
                     // load the file
-                    initReplayer();
                     if (replayer.loadRecord()){
                         JOptionPane.showMessageDialog(null, "Load successfully.");
                         // replay the file automatically
@@ -284,8 +307,6 @@ public class Field extends JPanel {
         return world;
     }
 
-    public ArrayList getRecord() { return record; }
-
     public int getSPACE() {
         return SPACE;
     }
@@ -323,7 +344,7 @@ public class Field extends JPanel {
             exec.shutdownNow();
         }
 
-        exec.shutdownNow();
+        //exec.shutdownNow();
         gameState = GameState.OVER;
         checkGameOverTimer.cancel();
         this.repaint();
@@ -347,7 +368,9 @@ public class Field extends JPanel {
     }
 
     private void  initReplayer() {
-        record = new ArrayList();
-        replayer = new Replayer(this);
+        ArrayList records = new ArrayList();
+        recordBuffer = new RecordBuffer(this, records);
+        replayer = new Replayer(this, recordBuffer);
     }
+
 }
