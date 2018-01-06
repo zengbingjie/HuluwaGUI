@@ -40,5 +40,11 @@ public class RecordBuffer {
         notifyAll();
     }
 
+    public boolean getIsSaved(){ // just for RecordBufferTest
+        return this.isSaved;
+    }
 
+    public boolean getFinishReading(){ // just for RecordBufferTest
+        return this.finishReading;
+    }
 }

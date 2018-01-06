@@ -29,14 +29,14 @@ public class Creature extends Thing2D implements Runnable {
     private void battleWith(Creature enemy){
         if (this.getCamp()==Camp.GOOD){
             Random random = new Random();
-            if (random.nextInt(100)>43) { // 60% chance for huluwas to win~
+            if (random.nextInt(100)>43) { // 57% chance for huluwas to win~
                 enemy.behurt();
             } else {
                 this.behurt();
             }
         } else {
             Random random = new Random();
-            if (random.nextInt(100)>57) { // 60% chance for huluwas to win~
+            if (random.nextInt(100)>57) { // 43% chance for huluwas to win~
                 enemy.behurt();
             } else {
                 this.behurt();
