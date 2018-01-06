@@ -36,6 +36,7 @@ public class Huluwa extends Creature {
                 this.fight();
             }
             try {
+                Random random = new Random();
                 Thread.sleep(10);
                 this.field.repaint();
             } catch (Exception e) {

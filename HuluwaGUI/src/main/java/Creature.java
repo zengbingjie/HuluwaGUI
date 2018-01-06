@@ -84,11 +84,12 @@ public class Creature extends Thing2D implements Runnable {
     }
 
     public char getIdentify() { return this.identify; }
-    public void setState(CreatureState state) {
+
+    public synchronized void setState(CreatureState state) {
         this.state = state;
     }
 
-    public void resetImage() {
+    public synchronized void resetImage() {
         URL loc = this.getClass().getClassLoader().getResource(this.name + this.state.toString() + ".png");
         ImageIcon iia = new ImageIcon(loc);
         Image image = iia.getImage();

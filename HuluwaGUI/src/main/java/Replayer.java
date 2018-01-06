@@ -36,7 +36,7 @@ public class Replayer implements Runnable {
 
     @Override
     public void run() {
-        while (!Thread.interrupted()) {
+//        while (!Thread.interrupted()) {
             try {
                 String recordLine = bufferedReader.readLine(); // the first number: the size of world
                 //System.out.println(recordLine);
@@ -53,6 +53,10 @@ public class Replayer implements Runnable {
                         this.field.getRecord().add(new Record(imageName, x, y));
                         recordLine = bufferedReader.readLine();
                     }
+                    if (recordLine==null){
+                        this.field.setStateREPLAYOVER();
+                        break;
+                    }
                     try{
                         Thread.sleep(10);
                         this.field.repaint();
@@ -67,5 +71,5 @@ public class Replayer implements Runnable {
                 e.printStackTrace();
             }
         }
-    }
+//    }
 }

@@ -62,11 +62,12 @@ public class Recorder implements Runnable {
     @Override
     public void run() {
         // record how many creatures there are in the world
-        ArrayList world = field.getWorld();
+         ArrayList world = field.getWorld();
         stringBuffer = Integer.toString(world.size()) + "\n";
+        int i = 0;
         while (!Thread.interrupted()) {
             world = field.getWorld(); // the amount of creatures is not supposed to change, just in case
-            for (int i = 0; i < world.size(); i++) {
+            for (i = 0; i < world.size(); i++) {
                 Thing2D item = (Thing2D) world.get(i);
                 if (item instanceof Creature){
                     stringBuffer += ((Creature) item).getRecord();
@@ -76,6 +77,13 @@ public class Recorder implements Runnable {
                 Thread.sleep(10);
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
+            }
+        }
+        world = field.getWorld(); // the amount of creatures is not supposed to change, just in case
+        for (int j = i; j < world.size(); j++) {
+            Thing2D item = (Thing2D) world.get(j);
+            if (item instanceof Creature){
+                stringBuffer += ((Creature) item).getRecord();
             }
         }
     }

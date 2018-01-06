@@ -13,21 +13,22 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 
 public class Field extends JPanel {
 
     private final int OFFSET = 10;
-    private final int SPACE = 100;
-    private final int N = 7; // row
-    private final int M = 11; // col
+    private final int SPACE = 70;
+    private final int N = 8; // row, should be no less than 8 because of the formation
+    private final int M = 12; // col, should be no less than 9 because of the formation
 
     private ExecutorService exec;
 
     private GameState gameState;
 
     private Recorder recorder;
-    Replayer replayer;
+    private Replayer replayer;
 
     private ArrayList record;
 
@@ -131,48 +132,63 @@ public class Field extends JPanel {
         // set background
         g.setColor(new Color(250, 240, 170));
         g.fillRect(0, 0, this.getWidth(), this.getHeight());
-        if (gameState == GameState.BEGIN) {
-            g.drawImage(new ImageIcon(getClass().getClassLoader().getResource("beginBackground.png")).getImage(), 0, 0, getWidth(), getHeight(), this);
-        } else if (gameState == GameState.PLAYING) {
-            g.drawImage(new ImageIcon(getClass().getClassLoader().getResource("background.png")).getImage(), 0, 0, getWidth(), getHeight(), this);
-        } else if (gameState == GameState.PEACE){
-            g.drawImage(new ImageIcon(getClass().getClassLoader().getResource("peaceBackground.png")).getImage(), 0, 0, getWidth(), getHeight(), this);
-        } else if (gameState == GameState.OVER) {
-            if (huluwasAllDead()) {
-                g.drawImage(new ImageIcon(getClass().getClassLoader().getResource("badWinBackground.png")).getImage(), 0, 0, getWidth(), getHeight(), this);
-            } else {
-                g.drawImage(new ImageIcon(getClass().getClassLoader().getResource("huluwaWinBackground.png")).getImage(), 0, 0, getWidth(), getHeight(), this);
-            }
-        } else if (gameState == GameState.REPLAYING){
-            g.drawImage(new ImageIcon(getClass().getClassLoader().getResource("background.png")).getImage(), 0, 0, getWidth(), getHeight(), this);
-            //System.out.println(record.size());
-            for (int i = 0; i < record.size(); i++) {
-                Record item = (Record) record.get(i);
-                //System.out.println(item.getImgName());
-                g.drawImage(new ImageIcon(getClass().getClassLoader().getResource(item.getImgName())).getImage(), item.getX(), item.getY(), this);
-            }
-        } else if (gameState == GameState.REPLAYOVER){
-            g.drawImage(new ImageIcon(getClass().getClassLoader().getResource("background.png")).getImage(), 0, 0, getWidth(), getHeight(), this);
-            //System.out.println(record.size());
-            for (int i = 0; i < record.size(); i++) {
-                Record item = (Record) record.get(i);
-                //System.out.println(item.getImgName());
-                g.drawImage(new ImageIcon(getClass().getClassLoader().getResource(item.getImgName())).getImage(), item.getX(), item.getY(), this);
-            }
-        }
+        g.drawImage(new ImageIcon(getClass().getClassLoader().getResource("background.png")).getImage(), 0, 0, getWidth(), getHeight(), this);
+
         if ((gameState != GameState.BEGIN) && (gameState != GameState.REPLAYING) && (gameState != GameState.REPLAYOVER)) {
             for (int i = 0; i < world.size(); i++) {
 
                 Thing2D item = (Thing2D) world.get(i);
 
                 if (item instanceof Creature) {
-                    g.drawImage(item.getImage(), item.x(), item.y(), this);
-                } else if (item instanceof Grandpa) {
-                    g.drawImage(item.getImage(), item.x(), item.y(), this);
+                    if (((Creature) item).isAlive()) {
+                        g.drawImage(item.getImage(), item.x(), item.y(),SPACE, SPACE, this);
+                    } else {
+                        g.drawImage(item.getImage(), item.x(), item.y(), this);
+                    }
                 } else {
                     //g.drawImage(item.getImage(), item.x(), item.y(), this);
                 }
             }
+        }
+
+        if (gameState == GameState.BEGIN) {
+
+            g.drawImage(new ImageIcon(getClass().getClassLoader().getResource("beginBackground.png")).getImage(), 0, 0, getWidth(), getHeight(), this);
+
+        } else if (gameState == GameState.PLAYING) {
+
+            // nothing
+        } else if (gameState == GameState.PEACE){
+
+            g.drawImage(new ImageIcon(getClass().getClassLoader().getResource("overHint.png")).getImage(), 20, 20, getWidth()/4, getHeight()/4, this);
+            g.drawImage(new ImageIcon(getClass().getClassLoader().getResource("peaceHint.png")).getImage(), getWidth()/4, getHeight()/6, getWidth()/2, getHeight()/6, this);
+
+        } else if (gameState == GameState.OVER) {
+
+            g.drawImage(new ImageIcon(getClass().getClassLoader().getResource("overHint.png")).getImage(), 20, 20, getWidth()/4, getHeight()/4, this);
+            if (huluwasAllDead()) {
+                g.drawImage(new ImageIcon(getClass().getClassLoader().getResource("badWinHint.png")).getImage(), getWidth()/4, getHeight()/6, getWidth()/2, getHeight()/6, this);
+            } else {
+                g.drawImage(new ImageIcon(getClass().getClassLoader().getResource("huluwaWinHint.png")).getImage(), getWidth()/4, getHeight()/6, getWidth()/2, getHeight()/6, this);
+            }
+
+        } else if (gameState == GameState.REPLAYING || gameState == GameState.REPLAYOVER){
+
+            //System.out.println(record.size());
+            for (int i = 0; i < this.record.size(); i++) {
+                Record item = (Record) record.get(i);
+                //System.out.println(item.getImgName());
+                if (item.getImgName().endsWith("DEAD.png")){
+                    g.drawImage(new ImageIcon(getClass().getClassLoader().getResource(item.getImgName())).getImage(), item.getX(), item.getY(), this);
+                } else {
+                    g.drawImage(new ImageIcon(getClass().getClassLoader().getResource(item.getImgName())).getImage(), item.getX(), item.getY(), SPACE, SPACE, this);
+                }
+            }
+            if (gameState == GameState.REPLAYOVER){
+                exec.shutdownNow();
+                g.drawImage(new ImageIcon(getClass().getClassLoader().getResource("replayOverHint.png")).getImage(), 20, 20, getWidth()/4, getHeight()/8, this);
+            }
+
         }
     }
 
@@ -195,9 +211,11 @@ public class Field extends JPanel {
                     checkGameOverTimer = new Timer();
                     checkGameOverTimer.scheduleAtFixedRate(new TimerTask() { // after 30 sec, must end the war
                         @Override
-                        public void run() {
-                            exec.shutdownNow();
-                            gameState = GameState.PEACE;
+                        public void run() { // force to end the war after 30 sec
+                            if (gameState == GameState.PLAYING) {
+                                exec.shutdownNow();
+                                gameState = GameState.PEACE;
+                            }
                             checkGameOverTimer.cancel();
                         }
                     }, 30000L, 30000L);
@@ -210,6 +228,7 @@ public class Field extends JPanel {
                     exec.execute(grandpa);
                     exec.execute(snake);
                     exec.execute(scorpion);
+                    repaint();
                 }
             } else if (key == KeyEvent.VK_R) { // Restart game
                 exec.shutdownNow();
@@ -219,6 +238,7 @@ public class Field extends JPanel {
                     recorder.clearCurrentRecord();
                 }
                 restartLevel();
+                repaint();
             } else if (key == KeyEvent.VK_L) { // Load Record
                 if (gameState == GameState.BEGIN){
                     // load the file
@@ -242,10 +262,11 @@ public class Field extends JPanel {
                     }
                     // restart automatically
                     restartLevel();
+                    repaint();
                 }
             }
 
-            repaint();
+
         }
     }
 
@@ -286,7 +307,22 @@ public class Field extends JPanel {
                 }
             }
         }
+
         // is over
+        try {
+            exec.shutdown();
+            exec.awaitTermination(500, TimeUnit.MILLISECONDS);
+        }
+        catch (InterruptedException e) {
+            //System.err.println("termination interrupted");
+        }
+        finally {
+            if (!exec.isTerminated()) {
+                //System.err.println("killing non-finished tasks");
+            }
+            exec.shutdownNow();
+        }
+
         exec.shutdownNow();
         gameState = GameState.OVER;
         checkGameOverTimer.cancel();
